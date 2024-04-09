@@ -31,7 +31,7 @@ Application.DisplayAlerts = False
 Application.ScreenUpdating = False
     obj.AddArgument ("start-maximized")
     obj.Start "chrome", ""
-    obj.Get "https://dealsinternalwebsite-eu.amazon.com/"
+    obj.Get "https://dealsinternalwebsite-eu.*****.com/"
     
     Set bl = ThisWorkbook.Sheets("Input")
     BenchMark = Timer
