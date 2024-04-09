@@ -1,0 +1,127 @@
+Private obj As New WebDriver
+Sub newPro()
+
+'Dim mp As Selenium.SelectElement
+Dim FindBy As New Selenium.By
+Set ws = ThisWorkbook.Sheets("sheet1")
+Dim selector As Selenium.SelectElement
+Dim actions As Selenium.actions
+Const MAX_WAIT_SEC As Long = 2
+
+
+obj.Start "chrome", ""
+
+lr = Worksheets("Sheet1").Cells(Rows.Count, 1).End(xlUp).Row
+
+
+obj.Get "https://dailyorders.amazon.com/#$15e48f6a25e91ff801cba1e35a8653d541b46bd9-0"
+
+Do
+obj.Wait (100)
+Loop While obj.IsElementPresent(FindBy.XPath("//span[normalize-space()='Preferences']")) = False
+
+obj.FindElementByXPath("//span[normalize-space()='Preferences']").Click
+
+'//input[@id='awsui-radio-button-21']
+
+Do
+obj.Wait (100)
+Loop While obj.IsElementPresent(FindBy.ID("awsui-radio-button-5")) = False
+
+obj.FindElementById("awsui-radio-button-5").Click
+
+obj.FindElementByXPath("//awsui-region[@name='footer']//span[@awsui-button-region='text'][normalize-space()='Apply']").Click
+
+obj.FindElementByXPath("/html[1]/body[1]/do-daily-orders[1]/do-main-component[1]/awsui-app-layout[1]/div[1]/main[1]/div[1]/div[2]/div[1]/awsui-region[1]/do-summary-component[1]/div[1]/div[2]/ca-currency[1]/awsui-select[1]/div[1]/div[1]/awsui-select-trigger[1]/div[1]/div[1]/span[1]/div[1]/div[1]/div[1]/span[1]").Click
+obj.FindElementByXPath("//span[contains(text(),'USD')]").Click
+
+
+Range("C2:D2").Select
+Selection.NumberFormat = "yyyy-mm-dd;@"
+
+datastart = Range("C2").Text
+dataend = Range("D2").Text
+
+obj.FindElementByXPath("//div[@class='awsui-input awsui-input-type-text awsui-input-has-icon-right uneditable-input']").Click
+
+obj.FindElementByXPath("//input[@name='daterangepicker_start']").Clear
+obj.FindElementByXPath("//input[@name='daterangepicker_start']").SendKeys (datastart)
+'obj.FindElementByXPath("//input[@name='daterangepicker_start']").SendKeys (Keys.Enter)
+
+'obj.Wait (300)
+'obj.FindElementByXPath("/html/body/div/div/div[1]/ul/li[6]").Click
+'obj.Wait (300)
+
+obj.FindElementByXPath("//input[@name='daterangepicker_end']").Clear
+obj.FindElementByXPath("//input[@name='daterangepicker_end']").SendKeys (dataend)
+'obj.FindElementByXPath("//input[@name='daterangepicker_end']").SendKeys (Keys.Enter)
+
+'obj.Wait (300)
+obj.FindElementByXPath("/html/body/div/div/div[1]/ul/li[6]").Click
+'obj.Wait (300)
+
+obj.FindElementByXPath("/html/body/do-daily-orders/do-main-component/awsui-app-layout/div/div[1]/nav/div/awsui-region/ca-common-marketplace/awsui-select/div/div/awsui-select-trigger/div/div/span/div/div/div/span").Click
+
+If Range("E2").Value = "ES" Then
+mp = "amazon.es"
+ElseIf Range("E2").Value = "IT" Then
+mp = "amazon.it"
+ElseIf Range("E2").Value = "DE" Then
+mp = "amazon.de"
+ElseIf Range("E2").Value = "FR" Then
+mp = "amazon.fr"
+ElseIf Range("E2").Value = "UK" Then
+mp = "amazon.co.uk"
+End If
+
+
+obj.FindElementByXPath("//*[contains(text(),'" & mp & "')]").Click
+
+
+For i = 2 To lr
+
+'-----------------------------------
+asinn = ws.Cells(i, 6)
+
+If IsEmpty(asinn) Then
+    ws.Cells(i, 6).Value = "no asin"
+    i = i + 1
+    asinn = ws.Cells(i, 6)
+End If
+
+
+
+
+obj.FindElementByClass("filters-btn-cancel").Click
+
+
+obj.FindElementById("awsui-input-1").SendKeys (asinn)
+obj.Wait 500
+
+obj.FindElementByXPath("/html[1]/body[1]/do-daily-orders[1]/do-main-component[1]/awsui-app-layout[1]/div[1]/main[1]/div[1]/div[2]/div[1]/awsui-region[1]/do-summary-component[1]/div[1]/div[2]/ca-currency[1]/awsui-select[1]/div[1]/div[1]/awsui-select-trigger[1]/div[1]/div[1]/span[1]/div[1]/div[1]/div[1]/span[1]").Click
+obj.FindElementByXPath("//span[contains(text(),'USD')]").Click
+obj.Wait 500
+
+Do
+obj.Wait (100)
+Loop While obj.IsElementPresent(FindBy.XPath("/html/body/do-daily-orders/do-main-component/awsui-app-layout/div/div[1]/nav/div/awsui-region/div/awsui-button/button/span")) = False
+
+obj.FindElementByXPath("/html/body/do-daily-orders/do-main-component/awsui-app-layout/div/div[1]/nav/div/awsui-region/div/awsui-button/button/span").Click
+obj.Wait 800
+obj.FindElementByXPath("/html[1]/body[1]/do-daily-orders[1]/do-main-component[1]/awsui-app-layout[1]/div[1]/main[1]/div[1]/div[2]/div[1]/awsui-region[1]/do-summary-component[1]/div[1]/div[2]/ca-currency[1]/awsui-select[1]/div[1]/div[1]/awsui-select-trigger[1]/div[1]/div[1]/span[1]/div[1]/div[1]/div[1]/span[1]").Click
+obj.FindElementByXPath("//span[contains(text(),'USD')]").Click
+obj.Wait 1000
+
+Do
+obj.Wait (100)
+Loop While obj.IsElementPresent(FindBy.Class("awsui-util-p-n")) = False
+
+ws.Cells(i, 9) = obj.FindElementByXPath("/html/body/do-daily-orders/do-main-component/awsui-app-layout/div/main/div/div[2]/div/awsui-region/do-summary-component/div[1]/do-summary-table-component/awsui-table/div/div[3]/table/tbody/tr[1]/td[2]/span/span").Text
+ws.Cells(i, 8) = obj.FindElementByXPath("/html/body/do-daily-orders/do-main-component/awsui-app-layout/div/main/div/div[2]/div/awsui-region/do-summary-component/div[1]/do-summary-table-component/awsui-table/div/div[3]/table/tbody/tr[1]/td[5]/span/span").Text
+Next
+
+
+'end
+obj.Quit
+MsgBox ("Data Extracted")
+End Sub
