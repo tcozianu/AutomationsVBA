@@ -1,0 +1,149 @@
+Private obj As New WebDriver
+
+Sub ChromeAuto()
+
+Dim mp As Selenium.SelectElement
+Dim FindBy As New Selenium.By
+Dim ddl As Selenium.SelectElement
+Const MAX_WAIT_SEC As Long = 2
+
+obj.Start "chrome", ""
+obj.Get "https://pricingrules-eu.******.com/home.html?legalEntityId=108"
+
+Do
+obj.Wait (100)
+Loop While obj.FindElementsById("marketplaceMerchantSelect").Count = 0
+
+
+Set ws = ThisWorkbook.Sheets("sheet1")
+
+d = Worksheets("Sheet1").Cells(Rows.Count, 1).End(xlUp).Row
+
+For i = 2 To d
+eh:
+Set mp = obj.FindElementById("marketplaceMerchantSelect").AsSelect
+
+If ws.Cells(i, 3).Value = "UK" Then
+  mp2 = "amazon.co.uk (9)"
+  ElseIf ws.Cells(i, 3).Value = "DE" Then
+  mp2 = "amazon.de (10)"
+  ElseIf ws.Cells(i, 3).Value = "FR" Then
+  mp2 = "amazon.fr (11)"
+  ElseIf ws.Cells(i, 3).Value = "IT" Then
+  mp2 = "amazon.it (755690533)"
+  Else
+  mp2 = "amazon.es (695831032)"
+  End If
+
+obj.Wait (500)
+mp.SelectByText (mp2)
+
+obj.FindElementByXPath("/html/body/div[5]/div[1]/nav/div[1]/form/input[2]").SendKeys (ws.Cells(i, 1))
+obj.Wait (100)
+obj.FindElementByClass("btn-xs").Click
+
+
+t = Timer
+Do
+obj.Wait (100)
+If Timer - t > MAX_WAIT_SEC Then Exit Do
+Loop While obj.IsElementPresent(FindBy.Class("page-title")) = False
+
+If obj.IsElementPresent(FindBy.Class("page-title")) = True Then
+ws.Cells(i, 6).Value = "Unable to find item with Merchant SKU/ASIN " & ws.Cells(i, 1) & " for marketplace " & ws.Cells(i, 3).Value
+obj.Get "https://pricingrules-eu.amazon.com/home.html?legalEntityId=108"
+i = i + 1
+If i > d Then
+obj.Quit
+MsgBox ("prices overrided")
+Exit Sub
+Else
+GoTo eh:
+End If
+
+Else
+Set override = obj.FindElementByXPath("/html/body/div[5]/div[2]/div[6]/div[7]/div[1]/div/a")
+
+
+Do
+obj.Wait (100)
+Loop While obj.IsElementPresent(FindBy.XPath("/html/body/div[5]/div[2]/div[6]/div[7]/div[1]/div/a")) = False
+
+
+override.Click
+
+Do
+obj.Wait (100)
+Loop While obj.FindElementsByClass("btn-primary").Count = 0
+
+
+obj.FindElementByXPath("/html/body/div[5]/div[2]/form/fieldset/table/tbody/tr[3]/td/input").SendKeys (ws.Cells(i, 2))
+
+'dtToday = Format(Now(), "yyyy-mm-dd hh:mm")
+
+'AppActivate ("Google Chrome")
+'obj.FindElementById("startDate").Click
+'AppActivate ("Google Chrome")
+'Application.SendKeys ("^a")
+'AppActivate ("Google Chrome")
+'Application.SendKeys ("{BS}")
+'AppActivate ("Google Chrome")
+'Application.SendKeys (dtToday)
+
+obj.Wait (300)
+
+obj.FindElementById("endDate").Clear
+obj.Wait (300)
+obj.FindElementById("endDate").SendKeys (ws.Cells(i, 5).Text)
+
+
+'AppActivate ("Google Chrome")
+'obj.FindElementById("endDate").Click
+'AppActivate ("Google Chrome")
+'Application.SendKeys ("^a")
+'AppActivate ("Google Chrome")
+'Application.SendKeys ("{BS}")
+'AppActivate ("Google Chrome")
+'Application.SendKeys (ws.Cells(i, 5).Text)
+
+obj.Wait (300)
+
+
+Set reason = obj.FindElementByName("reasonId").AsSelect
+reason.SelectByText (ws.Cells(2, 13).Text)
+
+obj.FindElementByClass("btn-primary").Click
+obj.Wait (2000)
+If obj.FindElementsByClass("btn-primary").Count = 1 Then
+Do
+obj.Wait (500)
+Loop While obj.FindElementsByName("acceptChange").Count = 0
+
+obj.FindElementByName("acceptChange").Click
+obj.Wait (500)
+obj.FindElementByClass("btn-primary").Click
+Else
+Do
+obj.Wait (100)
+Loop While obj.FindElementsByName("c_continue").Count = 0
+End If
+
+
+obj.FindElementByName("c_continue").Click
+
+Do
+obj.Wait (100)
+Loop While obj.FindElementsByClass("approve-button").Count = 0
+
+obj.FindElementByClass("approve-button").Click
+obj.Wait (1500)
+ws.Cells(i, 6).Value = "Overrided"
+
+obj.Get "https://pricingrules-eu.amazon.com/home.html?legalEntityId=108"
+End If
+Next
+
+obj.Quit
+MsgBox ("prices overrided")
+End Sub
+
