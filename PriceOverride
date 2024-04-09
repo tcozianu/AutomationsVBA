@@ -24,15 +24,15 @@ eh:
 Set mp = obj.FindElementById("marketplaceMerchantSelect").AsSelect
 
 If ws.Cells(i, 3).Value = "UK" Then
-  mp2 = "amazon.co.uk (9)"
+  mp2 = "*****.co.uk (9)"
   ElseIf ws.Cells(i, 3).Value = "DE" Then
-  mp2 = "amazon.de (10)"
+  mp2 = "*****.de (10)"
   ElseIf ws.Cells(i, 3).Value = "FR" Then
-  mp2 = "amazon.fr (11)"
+  mp2 = "*****.fr (11)"
   ElseIf ws.Cells(i, 3).Value = "IT" Then
-  mp2 = "amazon.it (755690533)"
+  mp2 = "*****.it (755690533)"
   Else
-  mp2 = "amazon.es (695831032)"
+  mp2 = "*****.es (695831032)"
   End If
 
 obj.Wait (500)
@@ -51,7 +51,7 @@ Loop While obj.IsElementPresent(FindBy.Class("page-title")) = False
 
 If obj.IsElementPresent(FindBy.Class("page-title")) = True Then
 ws.Cells(i, 6).Value = "Unable to find item with Merchant SKU/ASIN " & ws.Cells(i, 1) & " for marketplace " & ws.Cells(i, 3).Value
-obj.Get "https://pricingrules-eu.amazon.com/home.html?legalEntityId=108"
+obj.Get "https://pricingrules-eu.*****.com/home.html?legalEntityId=108"
 i = i + 1
 If i > d Then
 obj.Quit
