@@ -1,6 +1,7 @@
 **VBA and Selenium Automations**
 
 Welcome to my collection of automation scripts created using VBA and Selenium library!
+Please do explore each branch for automations.
 
 **Overview**
 This repository contains a set of automation scripts developed by me to streamline various tasks using VBA (Visual Basic for Applications) and Selenium WebDriver. 
